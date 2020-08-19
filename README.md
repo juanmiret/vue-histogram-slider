@@ -85,6 +85,7 @@ fontSize|number|12|Set text font size
 handleSize|number|26|Slider handle size
 histSliderGap|number|6|Set gap between slider and histogram
 updateColorOnChange|boolean|true|Update histogram bar color on change **(recommended false for performance)**
+showHistogram|boolean|false|Show/Hide the histogram
 
 ## 🔧 Event
 Name|Description
