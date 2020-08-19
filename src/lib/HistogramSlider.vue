@@ -1,6 +1,6 @@
 <template>
   <div :style="style" class="vue-histogram-slider-wrapper">
-    <svg :id="id" class="vue-histogram-view">
+    <svg :id="id" class="vue-histogram-view" v-if="showHistogram">
       <defs>
         <clipPath :id="clipId">
           <rect :width="width" :height="barHeight" x="0" y="0" />
@@ -72,6 +72,48 @@
           this.ionRangeSlider.update({ from, to })
           this.updateBarColor({ from, to })
         }
+      },
+      mountRangeSlider(min, max) {
+        this.histSlider = $(`#${this.histogramId}`).ionRangeSlider({
+          skin: 'round',
+          min: min,
+          max: max,
+          from: min,
+          to: max,
+          type: this.type,
+          grid: this.grid,
+          step: this.step,
+          from_fixed: this.fromFixed,
+          to_fixed: this.toFixed,
+          hide_min_max: this.hideMinMax,
+          hide_from_to: this.hideFromTo,
+          force_edges: this.forceEdges,
+          drag_interval: this.dragInterval,
+          grid_num: this.Number,
+          block: this.block,
+          keyboard: this.keyboard,
+          prettify: this.prettify,
+          onStart: val => {
+            this.$emit('start', val)
+          },
+          onUpdate: val => {
+            this.$emit('update', val)
+          },
+          onFinish: val => {
+            if (!this.updateColorOnChange) {
+              this.updateBarColor(val)
+            }
+            this.$emit('finish', val)
+          },
+          onChange: val => {
+            if (this.updateColorOnChange) {
+              this.updateBarColor(val)
+            }
+            this.$emit('change', val)
+          }
+        })
+
+        this.ionRangeSlider = this.histSlider.data('ionRangeSlider')
       },
       mountHistogram() {
         const width = this.width - 20
@@ -169,46 +211,7 @@
             this.ionRangeSlider.destroy()
           }
 
-          this.histSlider = $(`#${this.histogramId}`).ionRangeSlider({
-            skin: 'round',
-            min: min,
-            max: max,
-            from: min,
-            to: max,
-            type: this.type,
-            grid: this.grid,
-            step: this.step,
-            from_fixed: this.fromFixed,
-            to_fixed: this.toFixed,
-            hide_min_max: this.hideMinMax,
-            hide_from_to: this.hideFromTo,
-            force_edges: this.forceEdges,
-            drag_interval: this.dragInterval,
-            grid_num: this.Number,
-            block: this.block,
-            keyboard: this.keyboard,
-            prettify: this.prettify,
-            onStart: val => {
-              this.$emit('start', val)
-            },
-            onUpdate: val => {
-              this.$emit('update', val)
-            },
-            onFinish: val => {
-              if (!this.updateColorOnChange) {
-                this.updateBarColor(val)
-              }
-              this.$emit('finish', val)
-            },
-            onChange: val => {
-              if (this.updateColorOnChange) {
-                this.updateBarColor(val)
-              }
-              this.$emit('change', val)
-            }
-          })
-
-          this.ionRangeSlider = this.histSlider.data('ionRangeSlider')
+          this.mountRangeSlider(min, max)
 
           setTimeout(
             () => this.updateBarColor(this.ionRangeSlider.result),
@@ -221,7 +224,10 @@
     },
 
     mounted() {
-      this.mountHistogram()
+      this.mountRangeSlider(this.min, this.max)
+      if (this.showHistogram) {
+        this.mountHistogram()
+      }
     },
 
     destroyed() {
@@ -504,3 +510,4 @@
     font-size: 13px;
   }
 </style>
+

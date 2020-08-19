@@ -1,7 +1,10 @@
 export default {
+  showHistogram: {
+    type: Boolean,
+    default: false
+  },
   data: {
-    type: Array,
-    required: true
+    type: Array
   },
   min: {
     type: Number
